@@ -1,0 +1,26 @@
+# Python virtual environment
+venv/
+.venv/
+
+# Local test outputs and temporary media
+test_output/
+*.mp4
+*.avi
+*.mov
+*.webm
+*.mkv
+temp_videos/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Local environment configuration (if any)
+.env
+.env.local
+
+# IDE and Editor files
+.vscode/
+.idea/
+.DS_Store
