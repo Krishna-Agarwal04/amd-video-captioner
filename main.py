@@ -30,8 +30,8 @@ def process_single_task(task: dict, client: FireworksLLMClient) -> dict:
             "task_id": task_id,
             "formal": "Error: Missing video reference.",
             "sarcastic": "Error: Missing video reference.",
-            "humorous_tech": "Error: Missing video reference.",
-            "humorous_non_tech": "Error: Missing video reference."
+            "humorous-tech": "Error: Missing video reference.",
+            "humorous-non-tech": "Error: Missing video reference."
         }
         
     logger.info(f"--- Starting Processing for Task: {task_id} ---")
@@ -78,9 +78,7 @@ def process_single_task(task: dict, client: FireworksLLMClient) -> dict:
             "task_id": task_id,
             "formal": formal.strip(),
             "sarcastic": sarcastic.strip(),
-            "humorous_tech": humorous_tech.strip(),
             "humorous-tech": humorous_tech.strip(),
-            "humorous_non_tech": humorous_non_tech.strip(),
             "humorous-non-tech": humorous_non_tech.strip()
         }
         
@@ -96,8 +94,8 @@ def process_single_task(task: dict, client: FireworksLLMClient) -> dict:
             "task_id": task_id,
             "formal": f"Error during processing: {str(e)}",
             "sarcastic": "Error: Analysis failed due to technical difficulties.",
-            "humorous_tech": "Error: NullPointerException: Code failed to compile on AMD GPU.",
-            "humorous_non_tech": "Error: Something went wrong and the caption generator is on strike."
+            "humorous-tech": "Error: NullPointerException: Code failed to compile on AMD GPU.",
+            "humorous-non-tech": "Error: Something went wrong and the caption generator is on strike."
         }
         
     finally:
