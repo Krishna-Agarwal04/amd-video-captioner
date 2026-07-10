@@ -24,3 +24,9 @@ __pycache__/
 .vscode/
 .idea/
 .DS_Store
+
+# Presentation slides
+presentation.html
+presentation.pdf
+presentation.pptx
+presentation_slides.md

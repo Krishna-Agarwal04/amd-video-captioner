@@ -29,5 +29,5 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository }}:latest
-            ghcr.io/${{ github.repository }}:main
+            ghcr.io/krishna-agarwal04/amd-video-captioner:latest
+            ghcr.io/krishna-agarwal04/amd-video-captioner:main
