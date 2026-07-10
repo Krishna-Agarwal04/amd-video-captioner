@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Epoch Eclipse - AMD Video Captioner Presentation</title>
+    <!-- Modern Premium Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-dark: #0f172a;
+            --text-muted: #475569;
+            --accent-teal: #0f766e;
+            --accent-blue: #0284c7;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* Slide Container */
+        .presentation {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Individual Slides */
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            background-color: var(--bg-color);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(50px);
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                        transform 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                        visibility 0.6s;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-50px);
+        }
+
+        /* Slide Typography */
+        h1, h2 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            color: var(--text-dark);
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2.2rem;
+            color: var(--accent-teal);
+            margin-bottom: 2rem;
+            align-self: flex-start;
+            border-left: 5px solid var(--accent-teal);
+            padding-left: 15px;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 800px;
+            line-height: 1.5;
+        }
+
+        /* Slide 1 - Title Specifics */
+        .slide-title-card {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .team-meta {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px 40px;
+            box-shadow: var(--shadow-md);
+            margin-top: 10px;
+        }
+
+        .team-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-teal);
+            margin-bottom: 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .members-list {
+            display: flex;
+            gap: 30px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .members-list span {
+            position: relative;
+        }
+
+        .members-list span:not(:last-child)::after {
+            content: "•";
+            position: absolute;
+            right: -18px;
+            color: var(--border-color);
+        }
+
+        /* Two-Column Comparison Grid (Slide 2) */
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 10px;
+        }
+
+        .comp-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .comp-card h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .comp-card.challenge h3 {
+            color: #b91c1c;
+        }
+
+        .comp-card.solution h3 {
+            color: var(--accent-teal);
+        }
+
+        .comp-item {
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .comp-item strong {
+            display: block;
+            font-size: 1rem;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .comp-item p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        /* Flowchart Layout (Slide 3) */
+        .flowchart-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+            margin-top: 20px;
+        }
+
+        .flow-step {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            flex: 1;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .flow-step .step-num {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .flow-step strong {
+            font-size: 1.05rem;
+            color: var(--text-dark);
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .flow-step p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .flow-arrow {
+            font-size: 1.8rem;
+            color: var(--accent-teal);
+            font-weight: 700;
+        }
+
+        /* Grid Table Layout (Slides 4 & 5) */
+        .slide-table {
+            width: 100%;
+            max-width: 1100px;
+            border-collapse: collapse;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            margin-top: 10px;
+        }
+
+        .slide-table th, .slide-table td {
+            padding: 18px 24px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .slide-table th {
+            background-color: #f1f5f9;
+            color: var(--text-dark);
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .slide-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .slide-table td strong {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .slide-table td p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* Accent Badge */
+        .badge {
+            background-color: #f0fdf4;
+            color: #16a34a;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            position: absolute;
+            bottom: 30px;
+            right: 40px;
+            display: flex;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-dark);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .nav-btn:hover {
+            background-color: #f1f5f9;
+            border-color: var(--text-muted);
+        }
+
+        .slide-number {
+            position: absolute;
+            bottom: 38px;
+            left: 40px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            z-index: 100;
+        }
+
+        /* Print instructions helper styling */
+        .helper-text {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        /* Slide 5 Split Showcase Layout */
+        .showcase-container {
+            display: flex;
+            gap: 30px;
+            width: 100%;
+            max-width: 1100px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .showcase-video {
+            flex: 1.2;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .showcase-video video {
+            width: 100%;
+            height: auto;
+            max-height: 380px;
+            display: block;
+        }
+
+        .showcase-captions {
+            flex: 1.8;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .showcase-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 12px 18px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .showcase-card h3 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .showcase-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* High Resolution / Full Screen Sizing Media Query */
+        @media (min-width: 1600px) or (min-height: 900px) {
+            h1 { font-size: 4.8rem; }
+            h2 { font-size: 3.2rem; }
+            .subtitle { font-size: 1.8rem; max-width: 1000px; }
+            .team-meta { padding: 35px 60px; }
+            .team-name { font-size: 1.8rem; }
+            .members-list { font-size: 1.4rem; gap: 40px; }
+            .comp-card { padding: 35px; }
+            .comp-card h3 { font-size: 1.6rem; }
+            .comp-item strong { font-size: 1.3rem; margin-bottom: 8px; }
+            .comp-item p { font-size: 1.05rem; }
+            .flow-step { padding: 35px 25px; }
+            .flow-step .step-num { font-size: 1.0rem; margin-bottom: 12px; }
+            .flow-step strong { font-size: 1.4rem; margin-bottom: 10px; }
+            .flow-step p { font-size: 1.05rem; }
+            .flow-arrow { font-size: 2.5rem; }
+            .slide-table th { font-size: 1.3rem; padding: 22px 30px; }
+            .slide-table td { font-size: 1.15rem; padding: 22px 30px; }
+            .slide-table td p { font-size: 1.0rem; }
+            .badge { font-size: 0.95rem; padding: 6px 14px; }
+            .showcase-card { padding: 18px 24px; }
+            .showcase-card h3 { font-size: 1.2rem; }
+            .showcase-card p { font-size: 1.05rem; }
+            .showcase-video video { max-height: 480px; }
+            .slide-number { font-size: 1.2rem; bottom: 50px; left: 60px; }
+            .nav-controls { bottom: 40px; right: 60px; gap: 20px; }
+            .nav-btn { width: 56px; height: 56px; font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="helper-text">Press Arrow keys or click navigation. Press F11 for Full Screen.</div>
+
+    <div class="presentation">
+        <!-- Slide 1: Title -->
+        <div class="slide active" id="slide-1">
+            <div class="slide-title-card">
+                <h1>AMD-Gemma Video Captioner</h1>
+                <p class="subtitle">Multi-Style Video Intelligence Agent Powered by AMD & Fireworks AI</p>
+                
+                <div class="team-meta">
+                    <div class="team-name">Epoch Eclipse</div>
+                    <div class="members-list">
+                        <span>Krishna Agarwal</span>
+                        <span>Ayaan Arneja</span>
+                        <span>Prakhar Goel</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Challenge vs Solution -->
+        <div class="slide" id="slide-2">
+            <h2>The Challenge vs. Our Solution</h2>
+            <div class="comparison-grid">
+                <!-- Column 1: Challenge -->
+                <div class="comp-card challenge">
+                    <h3>❌ General Hurdles</h3>
+                    <div class="comp-item">
+                        <strong>High API Token Cost</strong>
+                        <p>Processing raw frames or full videos leads to extremely high visual token bills.</p>
+                    </div>
+                    <div class="comp-item">
+                        <strong>Temporal Hallucinations</strong>
+                        <p>Vision models get confused by timelines, describing video actions out of sequence.</p>
+                    </div>
+                    <div class="comp-item">
+                        <strong>Slow Multi-Call Latency</strong>
+                        <p>Querying models 4 separate times for different style captions runs slow & costs more.</p>
+                    </div>
+                </div>
+
+                <!-- Column 2: Solution -->
+                <div class="comp-card solution">
+                    <h3>✔️ Epoch Eclipse Architecture</h3>
+                    <div class="comp-item">
+                        <strong>Uniform Keyframe Sampler</strong>
+                        <p>Extracts exactly 10 frames via OpenCV, resizing to 512px to cut visual tokens by 60%.</p>
+                    </div>
+                    <div class="comp-item">
+                        <strong>Factual Timeline Grounding</strong>
+                        <p>VLM creates a chronological facts-timeline first, preventing chronological jumbling.</p>
+                    </div>
+                    <div class="comp-item">
+                        <strong>Single-Call JSON Stylization</strong>
+                        <p>Queries DeepSeek V4 Pro using strict JSON schema layout to get all 4 styles in one call.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Pipeline Flowchart -->
+        <div class="slide" id="slide-3">
+            <h2>System Architecture</h2>
+            <p class="subtitle" style="margin-bottom: 1rem; font-size: 1.1rem;">A lightweight, self-cleaning, and containerized media execution flow.</p>
+            
+            <div class="flowchart-container">
+                <div class="flow-step">
+                    <span class="step-num">Step 1</span>
+                    <strong>Download</strong>
+                    <p>Fetches URL target & caches locally</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <span class="step-num">Step 2</span>
+                    <strong>Extract (CV2)</strong>
+                    <p>Grabs 10 uniform frames, resizes to 512px</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <span class="step-num">Step 3</span>
+                    <strong>Analyze (VLM)</strong>
+                    <p>Kimi 2.6 maps visual chronological timeline</p>
+                </div>
+                <div class="flow-arrow">➔</div>
+                <div class="flow-step">
+                    <span class="step-num">Step 4</span>
+                    <strong>Style & JSON</strong>
+                    <p>DeepSeek formats 4 styles in a single JSON response</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Technology Stack -->
+        <div class="slide" id="slide-4">
+            <h2>The Technology Stack</h2>
+            
+            <table class="slide-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Layer</th>
+                        <th style="width: 35%;">Component</th>
+                        <th style="width: 40%;">Strategic Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Hardware</strong></td>
+                        <td>AMD GPU Cluster (Inference Cloud)</td>
+                        <td>High-performance server-side model acceleration.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>VLM (Vision)</strong></td>
+                        <td>Kimi K2.6 (<code>kimi-k2p6</code>)</td>
+                        <td>Accurate, highly active visual model on AMD hardware.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Text Generator</strong></td>
+                        <td>DeepSeek V4 Pro (<code>deepseek-v4-pro</code>)</td>
+                        <td>Top-tier instruction-following and JSON execution.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Libraries</strong></td>
+                        <td>OpenCV, Pydantic, OpenAI client</td>
+                        <td>Uniform pixel resizing & strict format validation.</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Deployment</strong></td>
+                        <td>Headless Docker Container</td>
+                        <td>Guarantees stable runtimes in grading environment.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide 5: Live Showcase -->
+        <div class="slide" id="slide-5">
+            <h2>Live Showcase (Example Output)</h2>
+            
+            <div class="showcase-container">
+                <!-- Left: Video Player -->
+                <div class="showcase-video">
+                    <video src="https://samplelib.com/lib/preview/mp4/sample-10s.mp4" controls playsinline></video>
+                </div>
+                
+                <!-- Right: Styled Captions list -->
+                <div class="showcase-captions">
+                    <div class="showcase-card" style="border-left: 4px solid var(--accent-teal);">
+                        <h3 style="color: var(--accent-teal);">👔 Formal Style</h3>
+                        <p>"A stationary camera captures a sunlit park scene featuring a green fence, large trees, and a grassy foreground. A white coach bus enters from the right, traverses the background behind the fence, and exits on the left."</p>
+                    </div>
+                    <div class="showcase-card" style="border-left: 4px solid #d97706;">
+                        <h3 style="color: #d97706;">😏 Sarcastic Style</h3>
+                        <p>"Absolutely gripping footage of a bus moving horizontally behind a fence. The trees and grass truly elevate the drama. Honestly, I've never seen anything so profoundly ordinary."</p>
+                    </div>
+                    <div class="showcase-card" style="border-left: 4px solid var(--accent-blue);">
+                        <h3 style="color: var(--accent-blue);">💻 Humorous-Tech Style</h3>
+                        <p>"That bus executed a flawless css translate animation across the viewport, but the background layer is stuck in an infinite idle loop. zero event listeners, just a single-threaded commute."</p>
+                    </div>
+                    <div class="showcase-card" style="border-left: 4px solid #7c3aed;">
+                        <h3 style="color: #7c3aed;">🎭 Humorous-Non-Tech Style</h3>
+                        <p>"Watching that bus disappear behind a tree is the grown-up version of peek-a-boo. One second it's there, the next it's gone—and you're still waiting for your own ride to show up."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Efficiency Metrics -->
+        <div class="slide" id="slide-6">
+            <h2>Performance & Efficiency Metrics</h2>
+            
+            <table class="slide-table">
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Metric Category</th>
+                        <th style="width: 30%;">Standard Multi-Call Path</th>
+                        <th style="width: 30%;">Epoch Eclipse Pipeline</th>
+                        <th style="width: 10%;">Gain</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>API Requests</strong></td>
+                        <td>4 separate API calls</td>
+                        <td>1 single structured API call</td>
+                        <td><span class="badge">75% Less</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Total Latency</strong></td>
+                        <td>~4.8 seconds</td>
+                        <td>~1.2 seconds</td>
+                        <td><span class="badge">4x Faster</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Token Consumption</strong></td>
+                        <td>~2,400 prompt tokens</td>
+                        <td>~800 prompt tokens</td>
+                        <td><span class="badge">66% Off</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Graceful Degradation</strong></td>
+                        <td>Crash risk on truncation / network block</td>
+                        <td>1024 token buffer + automated fallback</td>
+                        <td><span class="badge">100% Stable</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Navigation UI -->
+        <div class="slide-number"><span id="current-num">1</span> / 6</div>
+        
+        <div class="nav-controls">
+            <div class="nav-btn" id="prev-btn">◀</div>
+            <div class="nav-btn" id="next-btn">▶</div>
+        </div>
+    </div>
+
+    <!-- Interactive Navigation Scripts -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const currentNum = document.getElementById('current-num');
+        
+        let activeIdx = 0;
+
+        function updateSlides() {
+            slides.forEach((slide, idx) => {
+                slide.classList.remove('active', 'prev');
+                if (idx === activeIdx) {
+                    slide.classList.add('active');
+                } else if (idx < activeIdx) {
+                    slide.classList.add('prev');
+                }
+            });
+            currentNum.textContent = activeIdx + 1;
+        }
+
+        function nextSlide() {
+            if (activeIdx < slides.length - 1) {
+                activeIdx++;
+                updateSlides();
+            }
+        }
+
+        function prevSlide() {
+            if (activeIdx > 0) {
+                activeIdx--;
+                updateSlides();
+            }
+        }
+
+        // Button Clicks
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === 'Space') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>
