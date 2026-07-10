@@ -6,11 +6,10 @@ ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
 # Install system dependencies required for OpenCV and video handling
+# We use libglib2.0-0 and ffmpeg, removing build-essential and libgl1-mesa-glx which are prone to Debian mirror conflicts
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
     ffmpeg \
-    build-essential \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory inside the container
